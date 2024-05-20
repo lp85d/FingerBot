@@ -1,10 +1,20 @@
-name: Имя вашего workflow.
+Объяснение содержимого с кавычками
+name: 'Compile Arduino Sketch': Название workflow.
 on: [push]: Запускать workflow при каждом пуше изменений в репозиторий.
 jobs: Описывает работу, которая будет выполнена.
-runs-on: ubuntu-latest: Указывает, что работа будет выполнена на последней версии Ubuntu.
+runs-on: 'ubuntu-latest': Указывает, что работа будет выполнена на последней версии Ubuntu.
 steps: Шаги, которые будут выполнены в ходе работы:
-Checkout code: Получение кода из вашего репозитория.
-Set up Arduino CLI: Установка Arduino CLI.
-Install dependencies: Установка необходимых библиотек, например, WiFiManager.
-Compile sketch: Компиляция вашего скетча.
-Upload artifact: Загрузка скомпилированного .hex файла в качестве артефакта.
+name: 'Checkout code': Получение кода из вашего репозитория.
+uses: 'actions/checkout@v2': Использование действия для получения кода.
+name: 'Set up Arduino CLI': Установка Arduino CLI.
+uses: 'arduino/setup-arduino-cli@v1': Использование действия для установки Arduino CLI.
+with: version: 'latest': Указание версии Arduino CLI.
+name: 'Install dependencies': Установка необходимых библиотек.
+run: arduino-cli lib install 'WiFi': Установка библиотеки WiFi.
+name: 'Compile sketch': Компиляция вашего скетча.
+run: arduino-cli compile --fqbn esp32:esp32:esp32 src/sketch.ino --output-dir ./build: Компиляция скетча с указанием платы ESP32.
+name: 'Upload artifact': Загрузка скомпилированного .bin файла как артефакт.
+uses: 'actions/upload-artifact@v2': Использование действия для загрузки артефакта.
+with: name: 'compiled-sketch': Имя артефакта.
+path: './build/sketch.ino.bin': Путь к скомпилированному .bin файлу.
+Этот файл будет корректно работать и выполнять необходимые действия для компиляции вашего Arduino скетча.
