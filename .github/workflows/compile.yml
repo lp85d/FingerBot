@@ -25,4 +25,4 @@ jobs:
       run: arduino-cli compile --fqbn esp32:esp32:esp32 /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir /home/runner/work/arduino-project/arduino-project/
 
     - name: Copy Temp Files
-      run: find /tmp -type d -name 'arduino_build_*' -not -path '/tmp/system*' -exec cp -r {} /home/runner/work/arduino-project/arduino-project/ \;
+      run: sudo find /tmp -type d -name 'arduino_build_*' -not -path '/tmp/system*' -exec cp -r {} /home/runner/work/arduino-project/arduino-project/ \;
