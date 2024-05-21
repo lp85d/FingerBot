@@ -6,23 +6,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Set up Arduino CLI
-      run: |
-        wget https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz
-        tar -xvf arduino-cli_latest_Linux_64bit.tar.gz
-        sudo mv arduino-cli /usr/local/bin/
-        arduino-cli core update-index
-        arduino-cli core install esp32:esp32
-    - name: Install Libraries
-      run: |
-        arduino-cli lib install "WiFi"
-        arduino-cli lib install "HttpClient"
-        arduino-cli lib install "WiFiManager"
-        arduino-cli lib install "ArduinoJson"
-    - name: Compile Sketch
-      run: arduino-cli compile --fqbn esp32:esp32:esp32 /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir ${{ github.workspace }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Arduino CLI
+        run: |
+          wget https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz
+          tar -xvf arduino-cli_latest_Linux_64bit.tar.gz
+          sudo mv arduino-cli /usr/local/bin/
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32
+      - name: Install Libraries
+        run: |
+          arduino-cli lib install "WiFi"
+          arduino-cli lib install "HttpClient"
+          arduino-cli lib install "WiFiManager"
+          arduino-cli lib install "ArduinoJson"
+      - name: Compile Sketch
+        run: arduino-cli compile --fqbn esp32:esp32:esp32 /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir ${{ github.workspace }}
 
-    - name: Copy Temp Files
-      run: sudo find /tmp -type d -name 'arduino_build_*' -not -path '/tmp/system*' -exec cp -r {} /home/runner/work/arduino-project/arduino-project \;
+      - name: Copy Temp Files
+        run: sudo find /tmp -type d -name 'arduino_build_*' -not -path '/tmp/system*' -exec cp -r {} /home/runner/work/arduino-project/arduino-project \;
