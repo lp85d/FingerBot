@@ -10,14 +10,11 @@ jobs:
       - name: 'Checkout code'
         uses: 'actions/checkout@v2'
 
-      - name: 'Set up Python'
-        uses: 'actions/setup-python@v2'
-        with:
-          python-version: '3.x'
-
-      - name: 'Install arduino-cli'
+      - name: 'Set up Arduino CLI'
         run: |
-          pip install arduino-cli
+          mkdir -p ~/bin
+          wget -qO- https://github.com/arduino/arduino-cli/releases/download/0.18.3/arduino-cli_0.18.3_Linux_64bit.tar.gz | tar -xz -C ~/bin
+          echo "$HOME/bin" >> $GITHUB_PATH
           arduino-cli core update-index
           arduino-cli core install esp32:esp32
 
