@@ -12,22 +12,26 @@ jobs:
 
       - name: 'Set up Arduino CLI'
         run: |
-          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/0.18.3/install.sh | sh
           echo "$HOME/bin" >> $GITHUB_PATH
           arduino-cli core update-index
           arduino-cli core install esp32:esp32
-          arduino-cli config init
 
-      - name: 'Install dependencies'
-        run: |
-          arduino-cli lib install 'WiFi' | tee /dev/stderr
-          arduino-cli lib install 'HTTPClient' | tee /dev/stderr
-          arduino-cli lib install 'WiFiManager' | tee /dev/stderr
-          arduino-cli lib install 'ArduinoJson' | tee /dev/stderr
+      - name: 'Install WiFi library'
+        run: arduino-cli lib install 'WiFi'
+
+      - name: 'Install HTTPClient library'
+        run: arduino-cli lib install 'HTTPClient'
+
+      - name: 'Install WiFiManager library'
+        run: arduino-cli lib install 'WiFiManager'
+
+      - name: 'Install ArduinoJson library'
+        run: arduino-cli lib install 'ArduinoJson'
 
       - name: 'Compile sketch'
         run: |
-          arduino-cli compile --fqbn esp32:esp32:esp32 src/sketch.ino --output-dir ./build | tee /dev/stderr
+          arduino-cli compile --fqbn esp32:esp32:esp32 src/sketch.ino --output-dir ./build
 
       - name: 'Upload artifact'
         uses: 'actions/upload-artifact@v2'
