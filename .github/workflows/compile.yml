@@ -22,4 +22,11 @@ jobs:
           arduino-cli lib install "WiFiManager"
           arduino-cli lib install "ArduinoJson"
       - name: Compile Sketch
-        run: arduino-cli compile --fqbn esp32:esp32:esp32 /home/runner/work/${{ github.repository }}/arduino-project/src/src.ino --output-dir ${{ github.workspace }}/${{ github.repository }}/compiled
+        run: arduino-cli compile --fqbn esp32:esp32:esp32 /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir ${{ github.workspace }}/compiled
+      - name: Commit compiled files
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add ${{ github.workspace }}/compiled/*
+          git commit -m "Add compiled files"
+          git push
