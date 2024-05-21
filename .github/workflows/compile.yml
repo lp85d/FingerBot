@@ -22,4 +22,4 @@ jobs:
         arduino-cli lib install "WiFiManager"
         arduino-cli lib install "ArduinoJson"
     - name: Compile Sketch
-      run: arduino-cli compile --fqbn esp32:esp32:esp32 /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir /home/runner/work/arduino-project/arduino-project/ -p
+      run: arduino-cli compile --fqbn esp32:esp32:esp32 /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir /home/runner/work/arduino-project/arduino-project/ --preserve-temp-files
