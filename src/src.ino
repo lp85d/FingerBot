@@ -2,16 +2,20 @@
 #include <HTTPClient.h>
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
+#include <WebServer.h>
 
-WiFiServer server(80);
+WebServer server(80);
 int wpUserLevel = 0;
 const int ledPin = 13;
 
 String externalIP;
 unsigned long lastUpdateTime = 0;
 const unsigned long updateInterval = 600000; // 10 минут в миллисекундах
+unsigned long lastHandleClientTime = 0;
+const unsigned long handleClientInterval = 1000; // Интервал обработки клиентов в миллисекундах
 
-void saveConfigCallback() {
+void saveConfigCallback(WiFiManager *myWiFiManager) {
+  // Ваш код, если необходим
 }
 
 void setup() {
