@@ -22,6 +22,11 @@ jobs:
           arduino-cli lib install "WiFiManager"
           arduino-cli lib install "ArduinoJson"
       - name: Compile Sketch
-        env:
-          ARDUINO_CLI_TOKEN: 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
         run: arduino-cli compile --fqbn esp32:esp32:esp32 /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir ${{ github.workspace }}/build
+      - name: Commit and push firmware
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add ${{ github.workspace }}/build/*
+          git commit -m "Add compiled firmware"
+          git push https://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@github.com/lp85d/arduino-project.git
