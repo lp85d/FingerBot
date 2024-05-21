@@ -1,42 +1,25 @@
-name: 'Compile Arduino Sketch'
+name: Arduino CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: 'ubuntu-latest'
-
+    runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout code'
-        uses: 'actions/checkout@v2'
-
-      - name: 'Download and install Arduino CLI'
-        run: |
-          mkdir -p ~/bin
-          wget -qO- https://github.com/arduino/arduino-cli/releases/download/0.33.0/arduino-cli_0.33.0_Linux_64bit.tar.gz | tar -xz -C ~/bin
-          echo "PATH=$PATH:$HOME/bin" >> $GITHUB_ENV
-
-      - name: 'Verify Arduino CLI installation'
-        run: arduino-cli version
-
-      - name: 'Set up Arduino CLI'
-        run: |
-          arduino-cli core update-index
-          arduino-cli core install esp32:esp32
-
-      - name: 'Install libraries'
-        run: |
-          arduino-cli lib install 'WiFi'
-          arduino-cli lib install 'HTTPClient'
-          arduino-cli lib install 'WiFiManager'
-          arduino-cli lib install 'ArduinoJson'
-
-      - name: 'Compile sketch'
-        run: |
-          arduino-cli compile --fqbn esp32:esp32:esp32 src/sketch.ino --output-dir ./build
-
-      - name: 'Upload artifact'
-        uses: 'actions/upload-artifact@v2'
-        with:
-          name: 'compiled-sketch'
-          path: './build/sketch.ino.bin'
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Set up Arduino CLI
+      run: |
+        wget https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz
+        tar -xvf arduino-cli_latest_Linux_64bit.tar.gz
+        sudo mv arduino-cli /usr/local/bin/
+        arduino-cli core update-index
+        arduino-cli core install esp32:esp32
+    - name: Install Libraries
+      run: |
+        arduino-cli lib install "WiFi"
+        arduino-cli lib install "HttpClient"
+        arduino-cli lib install "WiFiManager"
+        arduino-cli lib install "ArduinoJson"
+    - name: Compile Sketch
+      run: arduino-cli compile --fqbn esp32:esp32:esp32 src/sketch.ino --output-dir ./build
