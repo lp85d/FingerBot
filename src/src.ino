@@ -1,16 +1,22 @@
 #ifdef ESP32
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WebServer.h>
 #else
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <ESP8266WebServer.h>
 #endif
 
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
-#include <WebServer.h>
 
+#ifdef ESP32
 WebServer server(80);
+#else
+ESP8266WebServer server(80);
+#endif
+
 int wpUserLevel = 0;
 const int ledPin = 13;
 
