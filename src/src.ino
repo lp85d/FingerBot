@@ -15,6 +15,7 @@
 WebServer server(80);
 #else
 ESP8266WebServer server(80);
+WiFiClient client;
 #endif
 
 int wpUserLevel = 0;
@@ -80,7 +81,11 @@ void handleRoot() {
 
 void updateExternalIP() {
     HTTPClient http;
+    #ifdef ESP32
     http.begin("https://fingerbot.online/ip/");
+    #else
+    http.begin(client, "https://fingerbot.online/ip/");
+    #endif
     http.setTimeout(5000); // Таймаут 5 секунд
     int httpCode = http.GET();
     
@@ -101,7 +106,11 @@ void updateExternalIP() {
 void getWPUserLevel() {
     String url = "https://fingerbot.online/wp-json/custom/v1/ip-address?wp_user_level=" + externalIP;
     HTTPClient http;
+    #ifdef ESP32
     http.begin(url);
+    #else
+    http.begin(client, url);
+    #endif
     http.setTimeout(5000); // Таймаут 5 секунд
     int httpCode = http.GET();
 
