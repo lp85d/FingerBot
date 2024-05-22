@@ -14,7 +14,6 @@ jobs:
           wget https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz
           tar -xvf arduino-cli_latest_Linux_64bit.tar.gz
           sudo mv arduino-cli /usr/local/bin/
-          arduino-cli core update-index
           arduino-cli core update-index --additional-urls http://arduino.esp8266.com/stable/package_esp8266com_index.json
           arduino-cli core install esp8266:esp8266 --additional-urls http://arduino.esp8266.com/stable/package_esp8266com_index.json
 
@@ -26,7 +25,7 @@ jobs:
           arduino-cli lib install "ArduinoJson"
 
       - name: Compile Sketch
-        run: arduino-cli compile --fqbn esp8266:esp8266:esp01_1m /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir ./build
+        run: arduino-cli compile --fqbn esp8266:esp8266:esp01 /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir ./build
 
       - name: Upload Firmware
         run: |
