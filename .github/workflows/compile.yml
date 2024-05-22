@@ -15,7 +15,7 @@ jobs:
           tar -xvf arduino-cli_latest_Linux_64bit.tar.gz
           sudo mv arduino-cli /usr/local/bin/
           arduino-cli core update-index
-          arduino-cli core install esp32:esp32
+          arduino-cli core install esp8266:esp8266  # Обратите внимание, что мы используем esp8266 вместо esp32
 
       - name: Install Libraries
         run: |
@@ -25,7 +25,7 @@ jobs:
           arduino-cli lib install "ArduinoJson"
 
       - name: Compile Sketch
-        run: arduino-cli compile --fqbn esp32:esp32:esp32 /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir ./build
+        run: arduino-cli compile --fqbn esp8266:esp8266:esp01_1m /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir ./build
 
       - name: Upload Firmware
         run: |
