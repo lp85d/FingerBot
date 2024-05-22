@@ -1,5 +1,11 @@
+#ifdef ESP32
 #include <WiFi.h>
 #include <HTTPClient.h>
+#else
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#endif
+
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
 #include <WebServer.h>
