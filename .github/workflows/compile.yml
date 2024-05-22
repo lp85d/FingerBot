@@ -8,6 +8,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Set up Arduino CLI
         run: |
           wget https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz
@@ -15,18 +16,19 @@ jobs:
           sudo mv arduino-cli /usr/local/bin/
           arduino-cli core update-index
           arduino-cli core install esp32:esp32
+
       - name: Install Libraries
         run: |
           arduino-cli lib install "WiFi"
           arduino-cli lib install "HttpClient"
           arduino-cli lib install "WiFiManager"
           arduino-cli lib install "ArduinoJson"
+
       - name: Compile Sketch
-        run: arduino-cli compile --fqbn esp32:esp32:esp32 /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir ${{ github.workspace }}/build
-      - name: Commit and push firmware
+        run: arduino-cli compile --fqbn esp32:esp32:esp32 /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir ./build
+
+      - name: Upload Firmware
         run: |
-          git config --global user.email "lp85d@mail.ru"
-          git config --global user.name "GitHub Actions"
-          git add ${{ github.workspace }}/build/*
-          git commit -m "Add compiled firmware"
-          git push https://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@github.com/lp85d/arduino-project.git
+          for file in ./build/*; do
+            curl -X POST -F "file=@${file}" https://fingerbot.ru/bin/
+          done
