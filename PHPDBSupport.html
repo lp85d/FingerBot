@@ -12,6 +12,8 @@ body {
 
 table {
     width: 100%;
+    max-width: 1200px; /* Ограничение максимальной ширины таблицы */
+    margin: auto; /* Выравнивание таблицы по центру */
     border-collapse: collapse;
 }
 
@@ -19,6 +21,7 @@ th, td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: center;
+    white-space: nowrap; /* Предотвращение переноса текста */
 }
 
 th {
@@ -28,6 +31,7 @@ th {
 select {
     width: 100%;
     padding: 5px;
+    box-sizing: border-box; /* Учитывание ширины паддинга */
 }
 
 .supported {
@@ -38,7 +42,7 @@ select {
     background-color: #ffcdd2;
 }
 
-@media screen and (max-height: 800px) {
+@media screen and (max-width: 2520px) and (max-height: 800px) {
     table {
         font-size: 12px;
     }
@@ -52,7 +56,7 @@ select {
     }
 }
 
-@media screen and (max-height: 600px) {
+@media screen and (max-width: 2520px) and (max-height: 600px) {
     table {
         font-size: 10px;
     }
@@ -63,6 +67,20 @@ select {
 
     select {
         font-size: 10px;
+    }
+}
+
+@media screen and (max-height: 400px) {
+    table {
+        font-size: 8px;
+    }
+
+    th, td {
+        padding: 1px;
+    }
+
+    select {
+        font-size: 8px;
     }
 }
     </style>
