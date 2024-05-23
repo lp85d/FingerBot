@@ -283,40 +283,33 @@ function updateCompatibility(dbType) {
             cell.innerText = '✘';
         }
     }
+    updateMinVersion(dbType);
 }
 
 function updateMinVersion(dbType) {
-    const cells = document.querySelectorAll(`#${dbType}-versions td`);
+    const versions = Object.keys(compatibility[dbType]);
     let minSupportedVersion = null;
 
-    cells.forEach(cell => {
-        if (cell.classList.contains('supported')) {
-            const version = cell.id.split('-')[1];
-            if (!minSupportedVersion || compareVersions(version, minSupportedVersion) < 0) {
-                minSupportedVersion = version;
-            }
+    for (let version of versions) {
+        const supportedPHPVersions = compatibility[dbType][version];
+        const isAnySupported = supportedPHPVersions.some(phpVersion => {
+            const cell = document.getElementById(`${dbType}-${phpVersion}`);
+            return cell && cell.classList.contains('supported');
+        });
+
+        if (isAnySupported) {
+            minSupportedVersion = version;
+            break;
         }
-    });
+    }
 
     const minVersionCell = document.getElementById(`${dbType}-min-version`);
     if (minSupportedVersion) {
         minVersionCell.innerText = minSupportedVersion;
     } else {
         minVersionCell.innerText = 'Не поддерживается';
+        alert('Никакие из версий PHP не поддерживаются для выбранной версии базы данных.');
     }
-}
-
-function compareVersions(v1, v2) {
-    const parts1 = v1.split('.').map(Number);
-    const parts2 = v2.split('.').map(Number);
-
-    for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
-        const part1 = parts1[i] || 0;
-        const part2 = parts2[i] || 0;
-        if (part1 > part2) return 1;
-        if (part1 < part2) return -1;
-    }
-    return 0;
 }
 
 function handleCellClick(event) {
@@ -324,32 +317,27 @@ function handleCellClick(event) {
     const dbType = cell.id.split('-')[0];
     const phpVersion = cell.id.split('-')[1];
 
-    cell.classList.toggle('supported');
-    cell.classList.toggle('unsupported');
-    cell.innerText = cell.classList.contains('supported') ? '✔' : '✘';
+    cell.classList.add('supported');
+    cell.classList.remove('unsupported');
+    cell.innerText = '✔';
 
     updateMinVersion(dbType);
 }
 
 document.getElementById('mysql-version').addEventListener('change', () => {
     updateCompatibility('mysql');
-    updateMinVersion('mysql');
 });
 document.getElementById('mariadb-version').addEventListener('change', () => {
     updateCompatibility('mariadb');
-    updateMinVersion('mariadb');
 });
 document.getElementById('postgresql-version').addEventListener('change', () => {
     updateCompatibility('postgresql');
-    updateMinVersion('postgresql');
 });
 document.getElementById('sqlite-version').addEventListener('change', () => {
     updateCompatibility('sqlite');
-    updateMinVersion('sqlite');
 });
 document.getElementById('mongodb-version').addEventListener('change', () => {
     updateCompatibility('mongodb');
-    updateMinVersion('mongodb');
 });
 
 document.querySelectorAll('td[id]').forEach(cell => {
@@ -359,16 +347,12 @@ document.querySelectorAll('td[id]').forEach(cell => {
 // Initialize compatibility on page load
 window.onload = () => {
     updateCompatibility('mysql');
-    updateMinVersion('mysql');
     updateCompatibility('mariadb');
-    updateMinVersion('mariadb');
     updateCompatibility('postgresql');
-    updateMinVersion('postgresql');
     updateCompatibility('sqlite');
-    updateMinVersion('sqlite');
     updateCompatibility('mongodb');
-    updateMinVersion('mongodb');
 };
+
     </script>
 </body>
 </html>
