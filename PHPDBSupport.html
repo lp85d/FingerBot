@@ -5,32 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Совместимость СУБД и PHP</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        select {
-            width: 100%;
-            padding: 5px;
-        }
-        .supported {
-            background-color: #c8e6c9;
-        }
-        .unsupported {
-            background-color: #ffcdd2;
-        }
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+select {
+    width: 100%;
+    padding: 5px;
+}
+
+.supported {
+    background-color: #c8e6c9;
+}
+
+.unsupported {
+    background-color: #ffcdd2;
+}
+
+@media screen and (max-height: 800px) {
+    table {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 4px;
+    }
+
+    select {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-height: 600px) {
+    table {
+        font-size: 10px;
+    }
+
+    th, td {
+        padding: 2px;
+    }
+
+    select {
+        font-size: 10px;
+    }
+}
     </style>
 </head>
 <body>
