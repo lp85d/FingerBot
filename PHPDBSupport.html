@@ -275,11 +275,13 @@ function updateCompatibility(dbType) {
 
     for (let phpVersion of ['7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']) {
         const cell = document.getElementById(`${dbType}-${phpVersion}`);
-        const isSupported = supportedPHPVersions.includes(phpVersion);
+        if (cell) {
+            const isSupported = supportedPHPVersions.includes(phpVersion);
 
-        cell.classList.remove('supported', 'unsupported');
-        cell.classList.add(isSupported ? 'supported' : 'unsupported');
-        cell.innerText = isSupported ? '✔' : '✘';
+            cell.classList.remove('supported', 'unsupported');
+            cell.classList.add(isSupported ? 'supported' : 'unsupported');
+            cell.innerText = isSupported ? '✔' : '✘';
+        }
     }
 
     // Find the minimum supported version
@@ -289,21 +291,28 @@ function updateCompatibility(dbType) {
         const phpVersion = parseFloat(cell.id.split('-')[1]);
         
         if (minSupportedVersion === null || phpVersion < minSupportedVersion) {
-            cell.classList.remove('supported');
-            cell.classList.add('unsupported');
-            cell.innerText = '✘';
+            if (cell) {
+                cell.classList.remove('supported');
+                cell.classList.add('unsupported');
+                cell.innerText = '✘';
+            }
         }
     }
 
     if (minSupportedVersion !== null) {
         const minVersionCell = document.getElementById(`${dbType}-${minSupportedVersion}`);
-        minVersionCell.classList.remove('unsupported');
-        minVersionCell.classList.add('supported');
-        minVersionCell.innerText = '✔';
+        if (minVersionCell) {
+            minVersionCell.classList.remove('unsupported');
+            minVersionCell.classList.add('supported');
+            minVersionCell.innerText = '✔';
+        } else {
+            alert(`Не удалось найти ячейку для минимально поддерживаемой версии`);
+        }
     } else {
         alert(`Базы не поддерживают данную версию PHP`);
     }
 }
+
 
 document.querySelectorAll('.compatibility-table td').forEach(cell => {
     cell.addEventListener('click', function() {
@@ -315,7 +324,6 @@ document.querySelectorAll('.compatibility-table td').forEach(cell => {
         updateCompatibility(dbType);
     });
 });
-
 
     document.getElementById('mysql-version').addEventListener('change', () => updateCompatibility('mysql'));
     document.getElementById('mariadb-version').addEventListener('change', () => updateCompatibility('mariadb'));
