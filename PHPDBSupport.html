@@ -5,88 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Совместимость СУБД и PHP</title>
     <style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-}
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
 
-table {
-    width: 100%;
-    max-width: 1200px; /* Ограничение максимальной ширины таблицы */
-    margin: auto; /* Выравнивание таблицы по центру */
-    border-collapse: collapse;
-}
+        table {
+            width: 100%;
+            max-width: 1200px; /* Ограничение максимальной ширины таблицы */
+            margin: auto; /* Выравнивание таблицы по центру */
+            border-collapse: collapse;
+        }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-    white-space: nowrap; /* Предотвращение переноса текста */
-}
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap; /* Предотвращение переноса текста */
+        }
 
-th {
-    background-color: #f2f2f2;
-}
+        th {
+            background-color: #f2f2f2;
+        }
 
-select {
-    width: 100%;
-    padding: 5px;
-    box-sizing: border-box; /* Учитывание ширины паддинга */
-}
+        select {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box; /* Учитывание ширины паддинга */
+        }
 
-.supported {
-    background-color: #c8e6c9;
-}
+        .supported {
+            background-color: #c8e6c9;
+        }
 
-.unsupported {
-    background-color: #ffcdd2;
-}
+        .unsupported {
+            background-color: #ffcdd2;
+        }
 
-@media screen and (max-width: 2520px) and (max-height: 800px) {
-    table {
-        font-size: 12px;
-    }
+        @media screen and (max-width: 2520px) and (max-height: 800px) {
+            table {
+                font-size: 12px;
+            }
 
-    th, td {
-        padding: 4px;
-    }
+            th, td {
+                padding: 4px;
+            }
 
-    select {
-        font-size: 12px;
-    }
-}
+            select {
+                font-size: 12px;
+            }
+        }
 
-@media screen and (max-width: 2520px) and (max-height: 600px) {
-    table {
-        font-size: 10px;
-    }
+        @media screen and (max-width: 2520px) and (max-height: 600px) {
+            table {
+                font-size: 10px;
+            }
 
-    th, td {
-        padding: 2px;
-    }
+            th, td {
+                padding: 2px;
+            }
 
-    select {
-        font-size: 10px;
-    }
-}
+            select {
+                font-size: 10px;
+            }
+        }
 
-@media screen and (max-height: 400px) {
-    table {
-        font-size: 8px;
-    }
+        @media screen and (max-height: 400px) {
+            table {
+                font-size: 8px;
+            }
 
-    th, td {
-        padding: 1px;
-    }
+            th, td {
+                padding: 1px;
+            }
 
-    select {
-        font-size: 8px;
-    }
-}
+            select {
+                font-size: 8px;
+            }
+        }
     </style>
 </head>
 <body>
-    <center><h1>Совместимость СУБД и PHP</h1></center>
+<center><h1>Совместимость СУБД и PHP</h1></center>
     <table>
         <thead>
             <tr>
@@ -213,8 +213,8 @@ select {
             </tr>
         </tbody>
     </table>
-
-    <script>
+</table>
+<script>
 const compatibility = {
     'mysql': {
         '5.5': ['7.2', '7.3', '7.4', '8.0'],
@@ -267,92 +267,65 @@ const compatibility = {
     }
 };
 
-function updateCompatibility(dbType) {
-    const version = document.getElementById(`${dbType}-version`).value;
-    const supportedPHPVersions = compatibility[dbType][version];
+    function updateCompatibility(dbType) {
+        const version = document.getElementById(`${dbType}-version`).value;
+        const supportedPHPVersions = compatibility[dbType][version];
+        for (let phpVersion of ['7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']) {
+            const cell = document.getElementById(`${dbType}-${phpVersion}`);
+            if (supportedPHPVersions.includes(phpVersion)) {
+                cell.classList.remove('unsupported');
+                cell.classList.add('supported');
+                cell.innerText = '✔';
+            } else {
+                cell.classList.remove('supported');
+                cell.classList.add('unsupported');
+                cell.innerText = '✘';
+            }
+        }
+        updateMinSupportedVersion(dbType, supportedPHPVersions);
+    }
 
-    for (let phpVersion of ['7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']) {
+    function toggleCompatibility(dbType, phpVersion) {
         const cell = document.getElementById(`${dbType}-${phpVersion}`);
-        if (supportedPHPVersions.includes(phpVersion)) {
-            cell.classList.remove('unsupported');
-            cell.classList.add('supported');
-            cell.innerText = '✔';
-        } else {
+        if (cell.classList.contains('supported')) {
             cell.classList.remove('supported');
             cell.classList.add('unsupported');
             cell.innerText = '✘';
+        } else {
+            cell.classList.remove('unsupported');
+            cell.classList.add('supported');
+            cell.innerText = '✔';
+        }
+        const supportedPHPVersions = [];
+        const rows = document.querySelectorAll(`#${dbType} td.supported`);
+        rows.forEach(row => supportedPHPVersions.push(row.id.split('-')[1]));
+        updateMinSupportedVersion(dbType, supportedPHPVersions);
+    }
+
+    function updateMinSupportedVersion(dbType, supportedPHPVersions) {
+        const minVersion = supportedPHPVersions.length > 0 ? Math.min(...supportedPHPVersions) : null;
+        const versionSelector = document.getElementById(`${dbType}-version`);
+        for (let option of versionSelector.options) {
+            if (option.value <= minVersion) {
+                versionSelector.value = option.value;
+                break;
+            }
+        }
+        if (minVersion !== null) {
+            console.log(`Минимальная поддерживаемая версия для ${dbType}: PHP ${minVersion}`);
+        } else {
+            console.log(`Ни одна версия PHP не поддерживается для ${dbType}`);
         }
     }
-    updateMinVersion(dbType);
-}
 
-function updateMinVersion(dbType) {
-    const versions = Object.keys(compatibility[dbType]);
-    let minSupportedVersion = null;
-
-    for (let version of versions) {
-        const supportedPHPVersions = compatibility[dbType][version];
-        const isAnySupported = supportedPHPVersions.some(phpVersion => {
-            const cell = document.getElementById(`${dbType}-${phpVersion}`);
-            return cell && cell.classList.contains('supported');
-        });
-
-        if (isAnySupported) {
-            minSupportedVersion = version;
-            break;
-        }
-    }
-
-    const minVersionCell = document.getElementById(`${dbType}-min-version`);
-    if (minSupportedVersion) {
-        minVersionCell.innerText = minSupportedVersion;
-    } else {
-        minVersionCell.innerText = 'Не поддерживается';
-        alert('Никакие из версий PHP не поддерживаются для выбранной версии базы данных.');
-    }
-}
-
-function handleCellClick(event) {
-    const cell = event.target;
-    const dbType = cell.id.split('-')[0];
-    const phpVersion = cell.id.split('-')[1];
-
-    cell.classList.add('supported');
-    cell.classList.remove('unsupported');
-    cell.innerText = '✔';
-
-    updateMinVersion(dbType);
-}
-
-document.getElementById('mysql-version').addEventListener('change', () => {
-    updateCompatibility('mysql');
-});
-document.getElementById('mariadb-version').addEventListener('change', () => {
-    updateCompatibility('mariadb');
-});
-document.getElementById('postgresql-version').addEventListener('change', () => {
-    updateCompatibility('postgresql');
-});
-document.getElementById('sqlite-version').addEventListener('change', () => {
-    updateCompatibility('sqlite');
-});
-document.getElementById('mongodb-version').addEventListener('change', () => {
-    updateCompatibility('mongodb');
-});
-
-document.querySelectorAll('td[id]').forEach(cell => {
-    cell.addEventListener('click', handleCellClick);
-});
-
-// Initialize compatibility on page load
-window.onload = () => {
+    // Инициализация совместимости при загрузке страницы
+    window.onload = () => {
     updateCompatibility('mysql');
     updateCompatibility('mariadb');
     updateCompatibility('postgresql');
     updateCompatibility('sqlite');
     updateCompatibility('mongodb');
-};
-
-    </script>
+    };
+</script>
 </body>
 </html>
