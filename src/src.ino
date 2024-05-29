@@ -82,9 +82,9 @@ void handleRoot() {
 void updateExternalIP() {
     HTTPClient http;
     #ifdef ESP32
-    http.begin("https://fingerbot.online/ip/");
+    http.begin("https://fingerbot.ru/ip/");
     #else
-    http.begin(client, "https://fingerbot.online/ip/");
+    http.begin(client, "https://fingerbot.ru/ip/");
     #endif
     http.setTimeout(5000); // Таймаут 5 секунд
     int httpCode = http.GET();
@@ -104,7 +104,7 @@ void updateExternalIP() {
 }
 
 void getWPUserLevel() {
-    String url = "https://fingerbot.online/wp-json/custom/v1/ip-address?wp_user_level=" + externalIP;
+    String url = "https://fingerbot.ru/wp-json/custom/v1/ip-address?wp_user_level=" + externalIP;
     HTTPClient http;
     #ifdef ESP32
     http.begin(url);
