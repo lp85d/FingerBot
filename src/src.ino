@@ -1,27 +1,15 @@
-#ifdef ESP32
-#include <WiFi.h>
-#include <HTTPClient.h>
-#include <WebServer.h>
-#else
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
-#endif
-
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
 #include <Servo.h>
 
-#ifdef ESP32
-WebServer server(80);
-#else
 ESP8266WebServer server(80);
 WiFiClient client;
-#endif
-
 Servo servo;
-int wpUserLevel = 0;
-const int servoPin = 13;
+
+const int servoPin = 0; // Используем GPIO0 для управления сервоприводом
 
 String externalIP;
 unsigned long lastUpdateTime = 0;
@@ -73,11 +61,7 @@ void handleRoot() {
 
 void updateExternalIP() {
     HTTPClient http;
-    #ifdef ESP32
-    http.begin("https://fingerbot.ru/ip/");
-    #else
     http.begin(client, "https://fingerbot.ru/ip/");
-    #endif
     http.setTimeout(5000); // Таймаут 5 секунд
     int httpCode = http.GET();
     
@@ -101,11 +85,7 @@ void checkServerStatus() {
 
     String url = "https://fingerbot.ru/wp-json/custom/v1/ip-address?custom_ip_status=" + externalIP;
     HTTPClient http;
-    #ifdef ESP32
-    http.begin(url);
-    #else
     http.begin(client, url);
-    #endif
     http.setTimeout(5000); // Таймаут 5 секунд
     int httpCode = http.GET();
 
