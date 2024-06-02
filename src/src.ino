@@ -25,7 +25,7 @@ String externalIP;
 unsigned long lastUpdateTime = 0;
 const unsigned long updateInterval = 600000; // 10 минут в миллисекундах
 unsigned long lastHandleClientTime = 0;
-const unsigned long handleClientInterval = 1000; // Интервал обработки клиентов в миллисекундах
+const unsigned long handleClientInterval = 10000; // Интервал обработки клиентов в миллисекундах
 
 void saveConfigCallback(WiFiManager *myWiFiManager) {
     // Ваш код, если необходим
@@ -104,7 +104,7 @@ void updateExternalIP() {
 }
 
 void getWPUserLevel() {
-    String url = "https://fingerbot.ru/wp-json/custom/v1/ip-address?wp_user_level=" + externalIP;
+    String url = "https://fingerbot.ru/wp-json/custom/v1/ip-address?custom_ip_status=" + externalIP;
     HTTPClient http;
     #ifdef ESP32
     http.begin(url);
