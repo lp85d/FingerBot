@@ -10,6 +10,7 @@
 
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
+#include <Servo.h>
 
 #ifdef ESP32
 WebServer server(80);
@@ -18,21 +19,23 @@ ESP8266WebServer server(80);
 WiFiClient client;
 #endif
 
+Servo servo;
 int wpUserLevel = 0;
-const int ledPin = 13;
+const int servoPin = 13;
 
 String externalIP;
 unsigned long lastUpdateTime = 0;
 const unsigned long updateInterval = 600000; // 10 минут в миллисекундах
-unsigned long lastHandleClientTime = 0;
-const unsigned long handleClientInterval = 10000; // Интервал обработки клиентов в миллисекундах
+unsigned long lastRequestTime = 0;
+const unsigned long requestInterval = 10000; // 10 секунд в миллисекундах
 
 void saveConfigCallback(WiFiManager *myWiFiManager) {
     // Ваш код, если необходим
 }
 
 void setup() {
-    pinMode(ledPin, OUTPUT);
+    servo.attach(servoPin);
+    servo.write(0); // Устанавливаем начальную позицию серво
 
     WiFiManager wifiManager;
     wifiManager.setAPCallback(saveConfigCallback);
@@ -55,24 +58,13 @@ void loop() {
             updateExternalIP();
         }
 
-        if (millis() - lastHandleClientTime > handleClientInterval) {
-            server.handleClient();
-            lastHandleClientTime = millis();
+        if (millis() - lastRequestTime > requestInterval) {
+            checkServerStatus();
+            lastRequestTime = millis();
         }
-    }
-}
 
-int parseUserLevel(String data) {
-    DynamicJsonDocument doc(1024);
-    DeserializationError error = deserializeJson(doc, data);
-    
-    if (error) {
-        Serial.print("deserializeJson() failed: ");
-        Serial.println(error.c_str());
-        return 0; // В случае ошибки возвращаем 0
+        server.handleClient();
     }
-
-    return doc["user_level"]; // Предполагаем, что уровень пользователя находится в "user_level"
 }
 
 void handleRoot() {
@@ -93,8 +85,7 @@ void updateExternalIP() {
         if (httpCode == HTTP_CODE_OK) {
             externalIP = http.getString();
             lastUpdateTime = millis();
-
-            getWPUserLevel();
+            Serial.println("External IP updated: " + externalIP);
         }
     } else {
         Serial.printf("Error on HTTP request: %d\n", httpCode);
@@ -103,7 +94,11 @@ void updateExternalIP() {
     http.end();
 }
 
-void getWPUserLevel() {
+void checkServerStatus() {
+    if (externalIP.isEmpty()) {
+        return;
+    }
+
     String url = "https://fingerbot.ru/wp-json/custom/v1/ip-address?custom_ip_status=" + externalIP;
     HTTPClient http;
     #ifdef ESP32
@@ -117,17 +112,36 @@ void getWPUserLevel() {
     if (httpCode > 0) {
         if (httpCode == HTTP_CODE_OK) {
             String payload = http.getString();
-            wpUserLevel = parseUserLevel(payload);
-            
-            if (wpUserLevel == 0) {
-                digitalWrite(ledPin, LOW);
-            } else if (wpUserLevel == 1) {
-                digitalWrite(ledPin, HIGH);
-            }
+            handleServerResponse(payload);
         }
     } else {
         Serial.printf("Error on HTTP request: %d\n", httpCode);
     }
 
     http.end();
+}
+
+void handleServerResponse(String payload) {
+    DynamicJsonDocument doc(1024);
+    DeserializationError error = deserializeJson(doc, payload);
+    
+    if (error) {
+        Serial.print("deserializeJson() failed: ");
+        Serial.println(error.c_str());
+        return;
+    }
+
+    if (doc.containsKey("code") && doc["code"] == "no_user_found") {
+        Serial.println("No user found with the specified IP address. Checking again in 10 minutes.");
+        lastUpdateTime = millis(); // Чтобы проверить IP через 10 минут
+        return;
+    }
+
+    if (doc[0]["custom_ip_status"] == "1") {
+        Serial.println("Status 1: Moving servo to 90 degrees clockwise.");
+        servo.write(90); // Двигаем сервопривод на 90 градусов по часовой стрелке
+    } else if (doc[0]["custom_ip_status"] == "0") {
+        Serial.println("Status 0: Moving servo to 90 degrees counterclockwise.");
+        servo.write(-90); // Двигаем сервопривод на 90 градусов против часовой стрелки
+    }
 }
