@@ -12,10 +12,10 @@ Servo servo;
 const int servoPin = 0;
 String externalIP;
 unsigned long lastUpdateTime = 0;
-const unsigned long updateInterval = 30000;
+const unsigned long updateInterval = 30000; // Интервал обновления IP (30 секунд)
 unsigned long lastRequestTime = 0;
-const unsigned long requestInterval = 6000;
-int currentPosition = 0;
+const unsigned long requestInterval = 6000; // Интервал проверки статуса сервера (6 секунд)
+int currentPosition = 90; // Начальное положение сервопривода (90 градусов для середины диапазона)
 String currentStatus = "Unknown";
 
 void saveConfigCallback(WiFiManager *myWiFiManager) {
@@ -117,15 +117,21 @@ void handleServerResponse(const String& response) {
 
     int status = doc[0]["custom_ip_status"].as<int>();
 
-    if (status == 1 && currentPosition != 180) {
+    if (status == 1 && currentStatus != "1") {
         Serial.println("Status 1: Moving servo to 180 degrees.");
-        servo.write(180);
-        currentPosition = 180;
+        currentPosition += 180;
+        if (currentPosition >= 360) {
+            currentPosition -= 360; // Обеспечение диапазона 0-360
+        }
+        servo.write(currentPosition);
         currentStatus = "1";
-    } else if (status == 0 && currentPosition != 0) {
-        Serial.println("Status 0: Moving servo to 0 degrees.");
-        servo.write(0);
-        currentPosition = 0;
+    } else if (status == 0 && currentStatus != "0") {
+        Serial.println("Status 0: Moving servo to -180 degrees.");
+        currentPosition -= 180;
+        if (currentPosition < 0) {
+            currentPosition += 360; // Обеспечение диапазона 0-360
+        }
+        servo.write(currentPosition);
         currentStatus = "0";
     }
 }
