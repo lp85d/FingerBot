@@ -54,6 +54,8 @@ void setup() {
     server.begin();
 
     Serial.begin(115200);
+
+    lastUpdateTime = millis(); // Инициализация lastUpdateTime текущим временем
 }
 
 void loop() {
@@ -66,13 +68,39 @@ void loop() {
             checkServerStatus();
             lastRequestTime = millis();
         }
-
-        server.handleClient();
     }
+
+    server.handleClient(); // Должен вызываться всегда для обработки запросов клиентов
 }
 
 void handleRoot() {
-    server.send(200, "text/html", "<h1>Выберите Wi-Fi</h1>");
+    if (externalIP.isEmpty()) {
+        server.send(200, "text/html", "<h1>External IP is not yet available. Please wait...</h1>");
+        return;
+    }
+
+    String url = "https://fingerbot.ru/wp-json/custom/v1/ip-address?custom_ip_status=" + externalIP;
+    HTTPClient http;
+    #ifdef ESP32
+    http.begin(url);
+    #else
+    http.begin(client, url);
+    #endif
+    http.setTimeout(5000); // Таймаут 5 секунд
+    int httpCode = http.GET();
+
+    if (httpCode > 0) {
+        if (httpCode == HTTP_CODE_OK) {
+            String payload = http.getString();
+            server.send(200, "application/json", payload);
+        } else {
+            server.send(500, "text/html", "Failed to get response from server.");
+        }
+    } else {
+        server.send(500, "text/html", "Error on HTTP request: " + String(httpCode));
+    }
+
+    http.end();
 }
 
 void updateExternalIP() {
@@ -145,7 +173,7 @@ void handleServerResponse(String payload) {
         Serial.println("Status 1: Moving servo to 90 degrees clockwise.");
         servo.write(90); // Двигаем сервопривод на 90 градусов по часовой стрелке
     } else if (doc[0]["custom_ip_status"] == "0") {
-        Serial.println("Status 0: Moving servo to 90 degrees counterclockwise.");
-        servo.write(-90); // Двигаем сервопривод на 90 градусов против часовой стрелки
+        Serial.println("Status 0: Moving servo to 0 degrees.");
+        servo.write(0); // Двигаем сервопривод обратно в начальное положение
     }
 }
