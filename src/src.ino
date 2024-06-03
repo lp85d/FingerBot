@@ -12,10 +12,11 @@ Servo servo;
 const int servoPin = 0;
 String externalIP;
 unsigned long lastUpdateTime = 0;
-const unsigned long updateInterval = 30000; // Интервал обновления IP (30 секунд)
+const unsigned long updateInterval = 30000;
 unsigned long lastRequestTime = 0;
-const unsigned long requestInterval = 6000; // Интервал проверки статуса сервера (6 секунд)
+const unsigned long requestInterval = 6000;
 int currentPosition = 0;
+String currentStatus = "Unknown";
 
 void saveConfigCallback(WiFiManager *myWiFiManager) {
     Serial.println("Entered config mode");
@@ -71,19 +72,12 @@ void loop() {
 void handleRoot() {
     Serial.println("handleRoot called");
 
-    if (externalIP.isEmpty()) {
-        server.send(200, "text/html", "<h1>External IP is not yet available. Please wait...</h1>");
-        return;
-    }
+    String message = "<h1>Device Status</h1>";
+    message += "<p>Current Position: " + String(currentPosition) + " degrees</p>";
+    message += "<p>Current Status: " + currentStatus + "</p>";
+    message += "<p>Signal Strength: " + String(WiFi.RSSI()) + " dBm</p>";
 
-    String url = "http://fingerbot.ru/wp-json/custom/v1/ip-address?custom_ip_status=" + externalIP;
-    sendHttpRequest(url, [&](int httpCode, const String& payload) {
-        if (httpCode == HTTP_CODE_OK) {
-            server.send(200, "application/json", payload);
-        } else {
-            server.send(500, "text/html", "Failed to get response from server.");
-        }
-    });
+    server.send(200, "text/html", message);
 }
 
 void updateExternalIP() {
@@ -123,14 +117,16 @@ void handleServerResponse(const String& response) {
 
     int status = doc[0]["custom_ip_status"].as<int>();
 
-    if (status == 1 && currentPosition != 90) {
-        Serial.println("Status 1: Moving servo to 90 degrees.");
-        servo.write(90);
-        currentPosition = 90;
+    if (status == 1 && currentPosition != 180) {
+        Serial.println("Status 1: Moving servo to 180 degrees.");
+        servo.write(180);
+        currentPosition = 180;
+        currentStatus = "1";
     } else if (status == 0 && currentPosition != 0) {
         Serial.println("Status 0: Moving servo to 0 degrees.");
         servo.write(0);
         currentPosition = 0;
+        currentStatus = "0";
     }
 }
 
