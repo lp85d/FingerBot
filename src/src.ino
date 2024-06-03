@@ -17,11 +17,12 @@ unsigned long lastRequestTime = 0;
 const unsigned long requestInterval = 6000; // Интервал проверки статуса сервера (6 секунд)
 int currentPosition = 90; // Начальное положение сервопривода (90 градусов для середины диапазона)
 String currentStatus = "Unknown";
+String logMessages; // Строка для хранения логов
 
 void saveConfigCallback(WiFiManager *myWiFiManager) {
-    Serial.println("Entered config mode");
-    Serial.println(WiFi.softAPIP());
-    Serial.println(myWiFiManager->getConfigPortalSSID());
+    logMessages += "Entered config mode\n";
+    logMessages += "IP: " + WiFi.softAPIP().toString() + "\n";
+    logMessages += "SSID: " + myWiFiManager->getConfigPortalSSID() + "\n";
 }
 
 void setup() {
@@ -31,10 +32,10 @@ void setup() {
 
     WiFiManager wifiManager;
     wifiManager.setAPCallback(saveConfigCallback);
-    wifiManager.setConfigPortalTimeout(180);
+    wifiManager.setConfigPortalTimeout(200);
 
     if (!wifiManager.autoConnect("FingerBot")) {
-        Serial.println("Failed to connect and hit timeout");
+        logMessages += "Failed to connect and hit timeout\n";
         delay(3000);
         ESP.restart();
     }
@@ -42,8 +43,13 @@ void setup() {
     server.on("/", handleRoot);
     server.begin();
 
-    Serial.println("Connected to WiFi network.");
-    Serial.println("Setup complete.");
+    logMessages += "Connected to WiFi network.\n";
+    logMessages += "Setup complete.\n";
+
+    // Вывод IP-адреса в Serial Monitor и в логи
+    Serial.print("IP Address: ");
+    Serial.println(WiFi.localIP());
+    logMessages += "IP Address: " + WiFi.localIP().toString() + "\n";
 
     lastUpdateTime = millis();
     lastRequestTime = millis();
@@ -63,44 +69,48 @@ void loop() {
             lastRequestTime = currentMillis;
         }
     } else {
-        Serial.println("WiFi not connected.");
+        logMessages += "WiFi not connected.\n";
     }
 
     server.handleClient();
 }
 
 void handleRoot() {
-    Serial.println("handleRoot called");
-
     String message = "<h1>Device Status</h1>";
     message += "<p>Current Position: " + String(currentPosition) + " degrees</p>";
     message += "<p>Current Status: " + currentStatus + "</p>";
     message += "<p>Signal Strength: " + String(WiFi.RSSI()) + " dBm</p>";
+    message += "<pre>" + logMessages + "</pre>";
 
     server.send(200, "text/html", message);
 }
 
 void updateExternalIP() {
-    Serial.println("Updating external IP...");
+    logMessages += "Updating external IP...\n";
     sendHttpRequest("http://fingerbot.ru/ip/", [&](int httpCode, const String& payload) {
         if (httpCode == HTTP_CODE_OK) {
             externalIP = payload;
-            Serial.println("External IP updated: " + externalIP);
+            logMessages += "External IP updated: " + externalIP + "\n";
         } else {
-            Serial.printf("Error on HTTP request: %d\n", httpCode);
+            logMessages += "Error on HTTP request: " + String(httpCode) + "\n";
         }
     });
 }
 
 void checkServerStatus() {
-    if (externalIP.isEmpty()) return;
+    if (externalIP.isEmpty()) {
+        logMessages += "External IP is empty, skipping status check.\n";
+        return;
+    }
 
     String url = "http://fingerbot.ru/wp-json/custom/v1/ip-address?custom_ip_status=" + externalIP;
+    logMessages += "Checking server status with URL: " + url + "\n";
     sendHttpRequest(url, [&](int httpCode, const String& payload) {
         if (httpCode == HTTP_CODE_OK) {
+            logMessages += "Server status response received: " + payload + "\n";
             handleServerResponse(payload);
         } else {
-            Serial.printf("Error checking server status. HTTP Code: %d\n", httpCode);
+            logMessages += "Error checking server status. HTTP Code: " + String(httpCode) + "\n";
         }
     });
 }
@@ -110,22 +120,26 @@ void handleServerResponse(const String& response) {
     DeserializationError error = deserializeJson(doc, response);
 
     if (error) {
-        Serial.print("Failed to parse response: ");
-        Serial.println(error.c_str());
+        logMessages += "Failed to parse response: " + String(error.c_str()) + "\n";
         return;
     }
 
     int status = doc[0]["custom_ip_status"].as<int>();
+    logMessages += "Parsed status: " + String(status) + "\n";
 
     if (status == 1 && currentStatus != "1") {
-        Serial.println("Status 1: Moving servo to 200 degrees.");
-        currentPosition = 200;
+        logMessages += "Status 1: Moving servo to 180 degrees.\n"; // Изменено на 180 градусов
+        currentPosition = 180;
+        logMessages += "Before servo.write(180)\n";
         servo.write(currentPosition);
+        logMessages += "After servo.write(180)\n";
         currentStatus = "1";
     } else if (status == 0 && currentStatus != "0") {
-        Serial.println("Status 0: Moving servo to 0 degrees.");
+        logMessages += "Status 0: Moving servo to 0 degrees.\n";
         currentPosition = 0;
+        logMessages += "Before servo.write(0)\n";
         servo.write(currentPosition);
+        logMessages += "After servo.write(0)\n";
         currentStatus = "0";
     }
 }
@@ -137,9 +151,9 @@ void sendHttpRequest(const String& url, std::function<void(int, const String&)> 
     int httpCode = http.GET();
     String payload = httpCode > 0 ? http.getString() : "";
 
-    Serial.printf("HTTP GET request to %s returned code: %d\n", url.c_str(), httpCode);
+    logMessages += "HTTP GET request to " + url + " returned code: " + String(httpCode) + "\n";
     if (!payload.isEmpty()) {
-        Serial.println("Response payload: " + payload);
+        logMessages += "Response payload: " + payload + "\n";
     }
 
     callback(httpCode, payload);
