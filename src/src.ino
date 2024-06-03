@@ -118,18 +118,18 @@ void handleServerResponse(const String& response) {
     int status = doc[0]["custom_ip_status"].as<int>();
 
     if (status == 1 && currentStatus != "1") {
-        Serial.println("Status 1: Moving servo to 180 degrees.");
-        currentPosition += 180;
-        if (currentPosition >= 360) {
-            currentPosition -= 360; // Обеспечение диапазона 0-360
+        Serial.println("Status 1: Moving servo to +180 degrees.");
+        currentPosition = (currentPosition + 180) % 360; // Обеспечение диапазона 0-360
+        if (currentPosition > 180) {
+            currentPosition -= 360; // Обеспечение диапазона 0-180
         }
         servo.write(currentPosition);
         currentStatus = "1";
     } else if (status == 0 && currentStatus != "0") {
         Serial.println("Status 0: Moving servo to -180 degrees.");
-        currentPosition -= 180;
+        currentPosition = (currentPosition - 180) % 360; // Обеспечение диапазона 0-360
         if (currentPosition < 0) {
-            currentPosition += 360; // Обеспечение диапазона 0-360
+            currentPosition += 360; // Обеспечение диапазона 0-180
         }
         servo.write(currentPosition);
         currentStatus = "0";
