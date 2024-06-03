@@ -38,6 +38,8 @@ void saveConfigCallback(WiFiManager *myWiFiManager) {
 }
 
 void setup() {
+    Serial.begin(115200);
+
     servo.attach(servoPin);
     servo.write(0); // Устанавливаем начальную позицию серво
 
@@ -55,8 +57,6 @@ void setup() {
 
     server.on("/", handleRoot); // Регистрация обработчика для корневого пути
     server.begin();
-
-    Serial.begin(115200);
 
     lastUpdateTime = millis(); // Инициализация lastUpdateTime текущим временем
 }
@@ -77,6 +77,7 @@ void loop() {
 }
 
 void handleRoot() {
+    Serial.println("handleRoot called");
     if (externalIP.isEmpty()) {
         server.send(200, "text/html", "<h1>External IP is not yet available. Please wait...</h1>");
         return;
@@ -92,9 +93,12 @@ void handleRoot() {
     http.setTimeout(5000); // Таймаут 5 секунд
     int httpCode = http.GET();
 
+    Serial.printf("HTTP GET request to %s returned code: %d\n", url.c_str(), httpCode);
+
     if (httpCode > 0) {
         if (httpCode == HTTP_CODE_OK) {
             String payload = http.getString();
+            Serial.println("Response payload: " + payload);
             server.send(200, "application/json", payload);
         } else {
             server.send(500, "text/html", "Failed to get response from server.");
@@ -116,6 +120,8 @@ void updateExternalIP() {
     http.setTimeout(5000); // Таймаут 5 секунд
     int httpCode = http.GET();
     
+    Serial.printf("HTTP GET request to https://fingerbot.ru/ip/ returned code: %d\n", httpCode);
+
     if (httpCode > 0) {
         if (httpCode == HTTP_CODE_OK) {
             externalIP = http.getString();
@@ -143,6 +149,8 @@ void checkServerStatus() {
     #endif
     http.setTimeout(5000); // Таймаут 5 секунд
     int httpCode = http.GET();
+
+    Serial.printf("HTTP GET request to %s returned code: %d\n", url.c_str(), httpCode);
 
     if (httpCode > 0) {
         if (httpCode == HTTP_CODE_OK) {
