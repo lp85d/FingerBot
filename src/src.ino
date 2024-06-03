@@ -44,7 +44,7 @@ void setup() {
     WiFiManager wifiManager;
     wifiManager.setAPCallback(saveConfigCallback);
 
-    if (!wifiManager.autoConnect("ArduinoAP")) {
+    if (!wifiManager.autoConnect("FingerBot")) {
         delay(3000);
         ESP.restart();
         delay(5000);
