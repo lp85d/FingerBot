@@ -44,10 +44,13 @@ void setup() {
     WiFiManager wifiManager;
     wifiManager.setAPCallback(saveConfigCallback);
 
+    // Настройка WiFiManager для постоянного создания AP в случае неудачи
+    wifiManager.setConfigPortalTimeout(180); // Тайм-аут 3 минуты для конфигурационного портала
+
     if (!wifiManager.autoConnect("FingerBot")) {
+        Serial.println("Failed to connect and hit timeout");
         delay(3000);
         ESP.restart();
-        delay(5000);
     }
 
     server.on("/", handleRoot); // Регистрация обработчика для корневого пути
