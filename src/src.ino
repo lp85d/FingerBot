@@ -14,7 +14,7 @@ String externalIP;
 unsigned long lastUpdateTime = 0;
 const unsigned long updateInterval = 24 * 60 * 60 * 1000; // Интервал обновления IP (24 часа)
 unsigned long lastRequestTime = 0;
-const unsigned long requestInterval = 60000; // Интервал проверки статуса сервера (1 минута)
+const unsigned long requestInterval = 10000; // Интервал проверки статуса сервера (10 секунд)
 int currentPosition = 90; // Начальное положение сервопривода (90 градусов для середины диапазона)
 String currentStatus = "Unknown";
 
@@ -29,7 +29,8 @@ void setup() {
     wifiManager.setAPCallback(saveConfigCallback);
     wifiManager.setConfigPortalTimeout(60); // Уменьшено время тайм-аута для соединения
 
-    if (!wifiManager.autoConnect("FingerBot")) {
+    if (!wifiManager.autoConnect()) {
+        wifiManager.startConfigPortal(); // Попытка подключения к доступной сети
         delay(3000);
         ESP.restart();
     }
