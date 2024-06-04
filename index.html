@@ -1,1 +1,41 @@
-test
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Прошивка ESP-01S</title>
+    <style>
+        body {
+            background-color: #222;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #f0ad4e;
+        }
+        
+        p {
+            margin-bottom: 10px;
+        }
+        
+        code {
+            background-color: #333;
+            color: #f0ad4e;
+            padding: 2px 5px;
+            margin: 0 3px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Прошивка ESP-01S</h1>
+    <p>Шаг 1: Подключите ESP-01S к компьютеру зажимая кнопку. После подключения отпустите кнопку и установите <a href="cloud.mail.ru/public/A6s8/iQLWutypK">драйвера</a>.</p>
+    <p>Шаг 2: Установите Python, установите esptool: <code>pip install esptool</code>.</p>
+    <p>Шаг 3: Проверьте подключение: <code>esptool chip_id</code>.</p>
+    <p>Шаг 4: Для прошивки файла <code>fingerbot.ru/bin/uploads/src.ino.bin</code>, используйте следующую команду:</p>
+    <code>esptool —port COM3 write_flash 0x00000 "C:\src.ino.bin"</code>
+    <p>Замените 3 на соответствующий порт и путь.</p>
+</body>
+</html>
