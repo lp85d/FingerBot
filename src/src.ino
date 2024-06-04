@@ -37,6 +37,10 @@ void setup() {
     server.on("/", handleRoot);
     server.begin();
 
+    if (WiFi.status() == WL_CONNECTED) {
+        updateExternalIP();
+    }
+
     lastUpdateTime = millis();
     lastRequestTime = millis();
 }
@@ -75,11 +79,13 @@ void handleRoot() {
 }
 
 void updateExternalIP() {
-    sendHttpRequest("http://fingerbot.ru/ip/", [&](int httpCode, const String& payload) {
-        if (httpCode == HTTP_CODE_OK) {
-            externalIP = payload;
-        }
-    });
+    if (WiFi.status() == WL_CONNECTED) {
+        sendHttpRequest("http://fingerbot.ru/ip/", [&](int httpCode, const String& payload) {
+            if (httpCode == HTTP_CODE_OK) {
+                externalIP = payload;
+            }
+        });
+    }
 }
 
 void checkServerStatus() {
