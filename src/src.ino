@@ -12,9 +12,9 @@ Servo servo;
 const int servoPin = 0;
 String externalIP;
 unsigned long lastUpdateTime = 0;
-const unsigned long updateInterval = 30000;
+const unsigned long updateInterval = 24 * 60 * 60 * 1000;
 unsigned long lastRequestTime = 0;
-const unsigned long requestInterval = 6000;
+const unsigned long requestInterval = 60000;
 int currentPosition = 90;
 String currentStatus = "Unknown";
 
@@ -27,7 +27,7 @@ void setup() {
 
     WiFiManager wifiManager;
     wifiManager.setAPCallback(saveConfigCallback);
-    wifiManager.setConfigPortalTimeout(200);
+    wifiManager.setConfigPortalTimeout(60);
 
     if (!wifiManager.autoConnect("FingerBot")) {
         delay(3000);
@@ -42,9 +42,9 @@ void setup() {
 }
 
 void loop() {
+    unsigned long currentMillis = millis();
+    
     if (WiFi.status() == WL_CONNECTED) {
-        unsigned long currentMillis = millis();
-
         if (currentMillis - lastUpdateTime > updateInterval) {
             updateExternalIP();
             lastUpdateTime = currentMillis;
@@ -54,9 +54,14 @@ void loop() {
             checkServerStatus();
             lastRequestTime = currentMillis;
         }
+        
+        server.handleClient();
+    } else {
+        if (currentMillis - lastRequestTime > requestInterval) {
+            reconnectWiFi();
+            lastRequestTime = currentMillis;
+        }
     }
-
-    server.handleClient();
 }
 
 void handleRoot() {
@@ -120,4 +125,13 @@ void sendHttpRequest(const String& url, std::function<void(int, const String&)> 
 
     callback(httpCode, payload);
     http.end();
+}
+
+void reconnectWiFi() {
+    WiFiManager wifiManager;
+    wifiManager.setConfigPortalTimeout(60);
+    if (!wifiManager.autoConnect("FingerBot")) {
+        delay(3000);
+        ESP.restart();
+    }
 }
