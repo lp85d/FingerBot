@@ -12,10 +12,10 @@ Servo servo;
 const int servoPin = 0;
 String externalIP;
 unsigned long lastUpdateTime = 0;
-const unsigned long updateInterval = 24 * 60 * 60 * 1000;
+const unsigned long updateInterval = 24 * 60 * 60 * 1000; // Интервал обновления IP (24 часа)
 unsigned long lastRequestTime = 0;
-const unsigned long requestInterval = 60000;
-int currentPosition = 90;
+const unsigned long requestInterval = 60000; // Интервал проверки статуса сервера (1 минута)
+int currentPosition = 90; // Начальное положение сервопривода (90 градусов для середины диапазона)
 String currentStatus = "Unknown";
 
 void saveConfigCallback(WiFiManager *myWiFiManager) {}
@@ -27,7 +27,7 @@ void setup() {
 
     WiFiManager wifiManager;
     wifiManager.setAPCallback(saveConfigCallback);
-    wifiManager.setConfigPortalTimeout(60);
+    wifiManager.setConfigPortalTimeout(60); // Уменьшено время тайм-аута для соединения
 
     if (!wifiManager.autoConnect("FingerBot")) {
         delay(3000);
