@@ -86,6 +86,20 @@ void handleRoot() {
     server.send(200, "text/html", message);
 }
 
+void updateExternalIP() {
+    if (WiFi.status() == WL_CONNECTED) {
+        String url = "https://fingerbot.ru/ip/";
+        sendHttpRequest(url, [&](int httpCode, const String& payload) {
+            if (httpCode == HTTP_CODE_OK) {
+                externalIP = payload;
+                Serial.print("Получен внешний IP: ");
+                Serial.println(externalIP);
+            } else {
+                Serial.println("Не удалось получить внешний IP");
+            }
+        });
+    }
+}
 
 void checkServerStatus() {
     if (externalIP.isEmpty()) {
