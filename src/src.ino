@@ -109,7 +109,7 @@ void checkServerStatus() {
         return;
     }
 
-    String url = "http://fingerbot.ru/wp-json/custom/v1/ip-address?custom_ip_status=" + externalIP;
+    String url = "https://fingerbot.ru/wp-json/custom/v1/ip-address?custom_ip_status=" + externalIP;
     sendHttpRequest(url, [&](int httpCode, const String& payload) {
         if (httpCode == HTTP_CODE_OK) {
             handleServerResponse(payload);
