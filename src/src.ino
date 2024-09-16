@@ -72,7 +72,7 @@ void loop() {
 void handleRoot() {
     String message = "<h1>Device Status</h1>";
     message += "<p>Current Position: " + String(currentPosition) + " degrees</p>";
-    message += "<p>Current Status: " + currentStatus + "</p>";
+    message += "<p>Current Status: " + currentStatus + "</p>"; // Статус устройства (серво)
     message += "<p>Signal Strength: " + String(WiFi.RSSI()) + " dBm</p>";
     
     if (externalIP.isEmpty()) {
@@ -81,20 +81,11 @@ void handleRoot() {
         message += "<p>External IP: " + externalIP + "</p>";
     }
 
+    message += "<p>Status server: " + currentStatus + "</p>"; // Добавляем строку для статуса сервера
+
     server.send(200, "text/html", message);
 }
 
-void updateExternalIP() {
-    if (WiFi.status() == WL_CONNECTED) {
-        sendHttpRequest("https://fingerbot.ru/ip/", [&](int httpCode, const String& payload) {
-            if (httpCode == HTTP_CODE_OK) {
-                externalIP = payload;
-            } else {
-                Serial.println("Failed to get External IP");
-            }
-        });
-    }
-}
 
 void checkServerStatus() {
     if (externalIP.isEmpty()) {
