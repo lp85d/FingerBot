@@ -4,9 +4,10 @@
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
 #include <Servo.h>
+#include <WiFiClientSecure.h> // Для поддержки HTTPS
 
 ESP8266WebServer server(80);
-WiFiClient client;
+WiFiClientSecure client; // Используем WiFiClientSecure для HTTPS
 Servo servo;
 
 const int servoPin = 0;
@@ -38,6 +39,8 @@ void setup() {
     server.on("/", handleRoot);
     server.begin();
 
+    client.setInsecure(); // Игнорируем проверку сертификата
+
     if (WiFi.status() == WL_CONNECTED) {
         updateExternalIP();
     }
@@ -68,7 +71,6 @@ void loop() {
         }
     }
 
-    // Проверка на ввод команды из монитора порта
     checkSerialInput();
 }
 
@@ -124,7 +126,6 @@ void handleServerResponse(const String& response) {
         return;
     }
 
-    // Если ответ содержит объект, а не массив
     int status = doc["custom_ip_status"].as<int>();
 
     if (status == 1 && currentStatus != "1") {
@@ -143,7 +144,7 @@ void sendHttpRequest(const String& url, std::function<void(int, const String&)> 
     }
 
     HTTPClient http;
-    http.begin(client, url);
+    http.begin(client, url);  // Используем защищённое соединение
     http.setTimeout(5000);
     int httpCode = http.GET();
     String payload = httpCode > 0 ? http.getString() : "";
@@ -156,7 +157,6 @@ void reconnectWiFi() {
     WiFiManager wifiManager;
     wifiManager.setConfigPortalTimeout(60);
     
-    // Проверка, если уже подключено
     if (WiFi.status() == WL_CONNECTED) {
         Serial.println("Уже подключено к сети Wi-Fi.");
         return;
@@ -165,21 +165,21 @@ void reconnectWiFi() {
     Serial.println("Введите 'reset' для сброса настроек Wi-Fi или 'connect' для подключения.");
 
     unsigned long startAttemptTime = millis();
-    while (millis() - startAttemptTime < 30000) { // Таймаут в 30 секунд
+    while (millis() - startAttemptTime < 30000) {
         if (Serial.available()) {
             String command = Serial.readStringUntil('\n');
-            command.trim(); // Удаляем лишние пробелы
+            command.trim();
             
             if (command.equalsIgnoreCase("reset")) {
                 Serial.println("Сбрасываю настройки Wi-Fi...");
-                WiFi.disconnect(true); // Удаляем сохраненные сети
+                WiFi.disconnect(true);
                 Serial.println("Настройки Wi-Fi сброшены. Устройство перезагружается...");
-                ESP.restart(); // Перезагрузка устройства
+                ESP.restart();
             } else if (command.equalsIgnoreCase("connect")) {
                 Serial.println("Попытка подключения к Wi-Fi...");
                 if (wifiManager.autoConnect("FingerBot")) {
                     Serial.println("Подключение успешно!");
-                    break; // Выход из цикла, если подключение успешно
+                    break;
                 } else {
                     Serial.println("Не удалось подключиться. Попробуйте снова.");
                 }
@@ -187,7 +187,7 @@ void reconnectWiFi() {
                 Serial.println("Неизвестная команда. Попробуйте 'reset' или 'connect'.");
             }
         }
-        delay(100); // Небольшая задержка для предотвращения излишней загрузки процессора
+        delay(100);
     }
 }
 
@@ -196,7 +196,6 @@ void checkSerialInput() {
         String command = Serial.readStringUntil('\n');
         command.trim();
         
-        // Обработка команд для перезагрузки или подключения
         if (command.equalsIgnoreCase("reset")) {
             reconnectWiFi();
         } else if (command.equalsIgnoreCase("connect")) {
@@ -205,14 +204,13 @@ void checkSerialInput() {
     }
 }
 
-// Плавное перемещение сервопривода
 void moveServo(int targetPosition) {
     if (currentPosition != targetPosition) {
         int step = currentPosition < targetPosition ? 1 : -1;
         while (currentPosition != targetPosition) {
             currentPosition += step;
             servo.write(currentPosition);
-            delay(20); // Небольшая задержка для плавного перемещения
+            delay(20);
         }
     }
 }
