@@ -49,3 +49,49 @@ FingerBot управляет сервоприводом, позволяя вкл
 
    Leaving...
    Hard resetting via RTS pin...
+
+# Вывод монитора порта PuTTY
+
+```bash
+*wm:AutoConnect: FAILED for  60606 ms
+*wm:StartAP with SSID:  FingerBot
+*wm:AP IP address: 192.168.4.1
+*wm:Starting Web Portal
+*wm:config portal has timed out
+*wm:config portal exiting
+
+ets Jan  8 2013,rst cause:1, boot mode:(3,6)
+
+load 0x4010f000, len 3424, room 16
+tail 0
+chksum 0x2e
+load 0x3fff20b8, len 40, room 8
+tail 0
+chksum 0x2b
+csum 0x2b
+v000739c0
+~ld
+▒▒▒n▒{▒▒o|▒▒d▒;lc▒
+▒|r▒l▒o▒
+▒g▒
+l`▒▒{▒d▒l▒
+▒*wm:AutoConnect
+*wm:Connecting to SAVED AP: 89041111985
+*wm:connectTimeout not set, ESP waitForConnectResult...
+*wm:AutoConnect: SUCCESS
+*wm:STA IP Address: 192.168.0.152
+Получен внешний IP: 185.175.119.204
+Ответ от сервера: [{"custom_ip_status":"1"}]
+Полученный статус сервера: 1
+Ответ от сервера: [{"custom_ip_status":"1"}]
+Полученный статус сервера: 1
+Ответ от сервера: [{"custom_ip_status":"1"}]
+Полученный статус сервера: 1
+Ответ от сервера: [{"custom_ip_status":"0"}]
+Полученный статус сервера: 0
+Ответ от сервера: [{"custom_ip_status":"0"}]
+Полученный статус сервера: 0
+Ответ от сервера: [{"custom_ip_status":"1"}]
+Полученный статус сервера: 1
+Ответ от сервера: [{"custom_ip_status":"1"}]
+Полученный статус сервера: 1
