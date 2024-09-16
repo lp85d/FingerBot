@@ -96,7 +96,7 @@ l`▒▒{▒d▒l▒
 Ответ от сервера: [{"custom_ip_status":"1"}]
 Полученный статус сервера: 1
 
-## Лог сервера
+# Лог сервера
 ```bash
 E:\OSPanel\home\lp85d.ru>osp log . 2 | findstr "fingerbot.ru"
 Журнал E:\OSPanel\logs\domains\fingerbot.ru_apache_error.log (нет записей)
