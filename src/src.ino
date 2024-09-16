@@ -117,6 +117,9 @@ void checkServerStatus() {
 }
 
 void handleServerResponse(const String& response) {
+    Serial.print("Ответ от сервера: ");
+    Serial.println(response);  // Выводим весь ответ для отладки
+
     StaticJsonDocument<200> doc;
     DeserializationError error = deserializeJson(doc, response);
 
@@ -125,14 +128,27 @@ void handleServerResponse(const String& response) {
         return;
     }
 
-    int status = doc["custom_ip_status"].as<int>();
+    // Проверяем, является ли полученный JSON массивом
+    if (doc.is<JsonArray>()) {
+        JsonArray arr = doc.as<JsonArray>();
+        if (arr.size() > 0) {
+            int status = arr[0]["custom_ip_status"].as<int>(); // Извлекаем статус из первого элемента массива
 
-    if (status == 1 && currentStatus != "1") {
-        moveServo(180);
-        currentStatus = "1";
-    } else if (status == 0 && currentStatus != "0") {
-        moveServo(0);
-        currentStatus = "0";
+            Serial.print("Полученный статус сервера: ");
+            Serial.println(status);
+
+            if (status == 1 && currentStatus != "1") {
+                moveServo(180);
+                currentStatus = "1";
+            } else if (status == 0 && currentStatus != "0") {
+                moveServo(0);
+                currentStatus = "0";
+            }
+        } else {
+            Serial.println("Массив пуст");
+        }
+    } else {
+        Serial.println("Ожидался массив, но получен другой формат данных");
     }
 }
 
