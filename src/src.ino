@@ -23,17 +23,22 @@ void saveConfigCallback(WiFiManager *myWiFiManager) {}
 
 void setup() {
     Serial.begin(115200);
+    Serial.println("Начало работы программы...");
     servo.attach(servoPin);
     servo.write(currentPosition);
 
     WiFiManager wifiManager;
     wifiManager.setAPCallback(saveConfigCallback);
-    wifiManager.setConfigPortalTimeout(60); // Уменьшено время тайм-аута для соединения
+    wifiManager.setConfigPortalTimeout(15); // Уменьшено время тайм-аута для соединения до 15 секунд
 
+    Serial.println("Попытка подключения к Wi-Fi..."); // Добавлен вывод перед попыткой подключения
     if (!wifiManager.autoConnect("FingerBot")) {
+        Serial.println("Не удалось подключиться к Wi-Fi. Запуск конфигурационного портала...");
         wifiManager.startConfigPortal(); // Попытка подключения к доступной сети
         delay(3000);
         ESP.restart();
+    } else {
+        Serial.println("Успешное подключение к Wi-Fi!");
     }
 
     server.on("/", handleRoot);
@@ -139,7 +144,7 @@ void handleServerResponse(const String& response) {
 
 void sendHttpRequest(const String& url, std::function<void(int, const String&)> callback) {
     if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("Wi-Fi not connected, cannot send HTTP request");
+        Serial.println("Wi-Fi не подключён, не могу отправить HTTP-запрос");
         return;
     }
 
@@ -155,7 +160,7 @@ void sendHttpRequest(const String& url, std::function<void(int, const String&)> 
 
 void reconnectWiFi() {
     WiFiManager wifiManager;
-    wifiManager.setConfigPortalTimeout(60);
+    wifiManager.setConfigPortalTimeout(15); // Тайм-аут подключения к Wi-Fi также уменьшен до 15 секунд
     
     if (WiFi.status() == WL_CONNECTED) {
         Serial.println("Уже подключено к сети Wi-Fi.");
