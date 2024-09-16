@@ -4,47 +4,40 @@
 #include <WiFiManager.h>
 #include <ArduinoJson.h>
 #include <Servo.h>
-#include <WiFiClientSecure.h> // Для поддержки HTTPS
+#include <WiFiClientSecure.h>
 
 ESP8266WebServer server(80);
-WiFiClientSecure client; // Используем WiFiClientSecure для HTTPS
+WiFiClientSecure client;
 Servo servo;
 
 const int servoPin = 0;
 String externalIP;
 unsigned long lastUpdateTime = 0;
-const unsigned long updateInterval = 24 * 60 * 60 * 1000; // Интервал обновления IP (24 часа)
+const unsigned long updateInterval = 24 * 60 * 60 * 1000;
 unsigned long lastRequestTime = 0;
-const unsigned long requestInterval = 10000; // Интервал проверки статуса сервера (10 секунд)
-int currentPosition = 90; // Начальное положение сервопривода (90 градусов для середины диапазона)
+const unsigned long requestInterval = 10000;
+int currentPosition = 90;
 String currentStatus = "Unknown";
 
 void saveConfigCallback(WiFiManager *myWiFiManager) {}
 
 void setup() {
     Serial.begin(115200);
-    Serial.println("Начало работы программы...");
     servo.attach(servoPin);
     servo.write(currentPosition);
 
     WiFiManager wifiManager;
     wifiManager.setAPCallback(saveConfigCallback);
-    wifiManager.setConfigPortalTimeout(15); // Уменьшено время тайм-аута для соединения до 15 секунд
+    wifiManager.setConfigPortalTimeout(15);
 
-    Serial.println("Попытка подключения к Wi-Fi..."); // Добавлен вывод перед попыткой подключения
     if (!wifiManager.autoConnect("FingerBot")) {
-        Serial.println("Не удалось подключиться к Wi-Fi. Запуск конфигурационного портала...");
-        wifiManager.startConfigPortal(); // Попытка подключения к доступной сети
-        delay(3000);
         ESP.restart();
-    } else {
-        Serial.println("Успешное подключение к Wi-Fi!");
     }
 
     server.on("/", handleRoot);
     server.begin();
 
-    client.setInsecure(); // Игнорируем проверку сертификата
+    client.setInsecure();
 
     if (WiFi.status() == WL_CONNECTED) {
         updateExternalIP();
@@ -70,10 +63,7 @@ void loop() {
         
         server.handleClient();
     } else {
-        if (currentMillis - lastRequestTime > requestInterval) {
-            reconnectWiFi();
-            lastRequestTime = currentMillis;
-        }
+        reconnectWiFi();
     }
 
     checkSerialInput();
@@ -97,11 +87,8 @@ void handleRoot() {
 void updateExternalIP() {
     if (WiFi.status() == WL_CONNECTED) {
         sendHttpRequest("https://fingerbot.ru/ip/", [&](int httpCode, const String& payload) {
-            Serial.print("HTTP Code: "); Serial.println(httpCode);
-            Serial.print("Payload: "); Serial.println(payload);
             if (httpCode == HTTP_CODE_OK) {
                 externalIP = payload;
-                Serial.print("External IP: "); Serial.println(externalIP);
             } else {
                 Serial.println("Failed to get External IP");
             }
@@ -118,6 +105,8 @@ void checkServerStatus() {
     sendHttpRequest(url, [&](int httpCode, const String& payload) {
         if (httpCode == HTTP_CODE_OK) {
             handleServerResponse(payload);
+        } else {
+            Serial.println("Ошибка при запросе статуса сервера");
         }
     });
 }
@@ -134,22 +123,21 @@ void handleServerResponse(const String& response) {
     int status = doc["custom_ip_status"].as<int>();
 
     if (status == 1 && currentStatus != "1") {
-        moveServo(180);  // Плавное перемещение на 180 градусов
+        moveServo(180);
         currentStatus = "1";
     } else if (status == 0 && currentStatus != "0") {
-        moveServo(0);    // Плавное перемещение на 0 градусов
+        moveServo(0);
         currentStatus = "0";
     }
 }
 
 void sendHttpRequest(const String& url, std::function<void(int, const String&)> callback) {
     if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("Wi-Fi не подключён, не могу отправить HTTP-запрос");
         return;
     }
 
     HTTPClient http;
-    http.begin(client, url);  // Используем защищённое соединение
+    http.begin(client, url);
     http.setTimeout(5000);
     int httpCode = http.GET();
     String payload = httpCode > 0 ? http.getString() : "";
@@ -160,39 +148,14 @@ void sendHttpRequest(const String& url, std::function<void(int, const String&)> 
 
 void reconnectWiFi() {
     WiFiManager wifiManager;
-    wifiManager.setConfigPortalTimeout(15); // Тайм-аут подключения к Wi-Fi также уменьшен до 15 секунд
+    wifiManager.setConfigPortalTimeout(15);
     
     if (WiFi.status() == WL_CONNECTED) {
-        Serial.println("Уже подключено к сети Wi-Fi.");
         return;
     }
 
-    Serial.println("Введите 'reset' для сброса настроек Wi-Fi или 'connect' для подключения.");
-
-    unsigned long startAttemptTime = millis();
-    while (millis() - startAttemptTime < 30000) {
-        if (Serial.available()) {
-            String command = Serial.readStringUntil('\n');
-            command.trim();
-            
-            if (command.equalsIgnoreCase("reset")) {
-                Serial.println("Сбрасываю настройки Wi-Fi...");
-                WiFi.disconnect(true);
-                Serial.println("Настройки Wi-Fi сброшены. Устройство перезагружается...");
-                ESP.restart();
-            } else if (command.equalsIgnoreCase("connect")) {
-                Serial.println("Попытка подключения к Wi-Fi...");
-                if (wifiManager.autoConnect("FingerBot")) {
-                    Serial.println("Подключение успешно!");
-                    break;
-                } else {
-                    Serial.println("Не удалось подключиться. Попробуйте снова.");
-                }
-            } else {
-                Serial.println("Неизвестная команда. Попробуйте 'reset' или 'connect'.");
-            }
-        }
-        delay(100);
+    if (!wifiManager.autoConnect("FingerBot")) {
+        ESP.restart();
     }
 }
 
@@ -201,9 +164,7 @@ void checkSerialInput() {
         String command = Serial.readStringUntil('\n');
         command.trim();
         
-        if (command.equalsIgnoreCase("reset")) {
-            reconnectWiFi();
-        } else if (command.equalsIgnoreCase("connect")) {
+        if (command.equalsIgnoreCase("reset") || command.equalsIgnoreCase("connect")) {
             reconnectWiFi();
         }
     }
