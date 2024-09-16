@@ -1,14 +1,18 @@
 # FingerBot
 
-Проект для управления сервоприводом через интернет на базе ESP8266.
+Проект для управления серво-приводом через интернет на базе ESP8266.
 
 ## Описание
 
-FingerBot управляет сервоприводом, позволяя включать и выключать его по запросу с сервера.
+FingerBot управляет серво-приводом, позволяя включать и выключать его по запросу с сервера. Этот проект включает в себя настройку прошивки ESP8266 и взаимодействие с сервером для управления устройством.
 
 ## Установка
 
-1. Запустите следующие команды для прошивки устройства:
+Следуйте этим шагам для прошивки устройства и настройки:
+
+1. **Прошивка устройства:**
+
+   Выполните следующие команды в командной строке:
 
    ```bash
    C:\Windows\System32>python -m esptool chip_id
@@ -28,7 +32,11 @@ FingerBot управляет сервоприводом, позволяя вкл
    Stub running...
    Chip ID: 0x002864f4
    Hard resetting via RTS pin...
+   ```
 
+   После получения Chip ID, прошейте устройство:
+
+   ```bash
    C:\Windows\System32>python -m esptool --port COM9 write_flash 0x00000 "E:\OSPanel\home\fingerbot.ru\bin\uploads\src.ino.bin"
    esptool.py v4.7.0
    Serial port COM9
@@ -50,7 +58,11 @@ FingerBot управляет сервоприводом, позволяя вкл
    Leaving...
    Hard resetting via RTS pin...
 
-# Вывод монитора порта PuTTY
+   ```
+
+## Вывод монитора порта PuTTY
+
+После прошивки и перезагрузки устройства, можно просмотреть вывод монитора порта с помощью PuTTY. Пример вывода:
 
 ```bash
 *wm:AutoConnect: FAILED for  60606 ms
@@ -95,8 +107,12 @@ l`▒▒{▒d▒l▒
 Полученный статус сервера: 1
 Ответ от сервера: [{"custom_ip_status":"1"}]
 Полученный статус сервера: 1
+```
 
-# Лог сервера
+## Лог сервера
+
+Просмотрите логи сервера для диагностики и отслеживания запросов от FingerBot:
+
 ```bash
 E:\OSPanel\home\lp85d.ru>osp log . 2 | findstr "fingerbot.ru"
 Журнал E:\OSPanel\logs\domains\fingerbot.ru_apache_error.log (нет записей)
@@ -106,3 +122,16 @@ E:\OSPanel\home\lp85d.ru>osp log . 2 | findstr "fingerbot.ru"
 191.96.97.58 - - [21/Aug/2024:17:49:05 +0300] "POST /wp-admin/admin-ajax.php HTTP/2.0" 200 5 "https://fingerbot.ru/wp-admin/admin.php?page=custom-ip-address" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
 Журнал E:\OSPanel\logs\domains\fingerbot.ru_nginx_access.log
 192.168.0.211 - - [16/Sep/2024:16:15:34 +0300] "POST /wp-admin/admin-ajax.php HTTP/2.0" 200 5 "https://fingerbot.ru/wp-admin/admin.php?page=custom-ip-address" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+```
+
+## Примеры использования
+
+Приведите примеры команд или сценариев, чтобы продемонстрировать, как управлять FingerBot через сервер.
+
+## Участие
+
+Если вы хотите внести свой вклад в проект, пожалуйста, создайте форк и отправьте пулл-реквест.
+
+## Лицензия
+
+Укажите лицензию, под которой распространяется проект (например, MIT, GNU и т.д.).
