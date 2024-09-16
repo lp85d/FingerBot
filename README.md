@@ -96,3 +96,11 @@ l`▒▒{▒d▒l▒
 Ответ от сервера: [{"custom_ip_status":"1"}]
 Полученный статус сервера: 1
 
+E:\OSPanel\home\lp85d.ru>osp log . 2 | findstr "fingerbot.ru"
+Журнал E:\OSPanel\logs\domains\fingerbot.ru_apache_error.log (нет записей)
+Журнал E:\OSPanel\logs\domains\fingerbot.ru_nginx_error.log (нет записей)
+Журнал E:\OSPanel\logs\domains\fingerbot.ru_apache_access.log
+191.96.97.58 - - [21/Aug/2024:17:48:15 +0300] "POST /wp-admin/admin-ajax.php HTTP/2.0" 200 51 "https://fingerbot.ru/wp-admin/admin.php?page=custom-ip-address" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+191.96.97.58 - - [21/Aug/2024:17:49:05 +0300] "POST /wp-admin/admin-ajax.php HTTP/2.0" 200 5 "https://fingerbot.ru/wp-admin/admin.php?page=custom-ip-address" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+Журнал E:\OSPanel\logs\domains\fingerbot.ru_nginx_access.log
+192.168.0.211 - - [16/Sep/2024:16:15:34 +0300] "POST /wp-admin/admin-ajax.php HTTP/2.0" 200 5 "https://fingerbot.ru/wp-admin/admin.php?page=custom-ip-address" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
