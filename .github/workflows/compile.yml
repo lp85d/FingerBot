@@ -23,7 +23,7 @@ jobs:
           arduino-cli lib install "ArduinoJson"
 
       - name: Compile Sketch
-        run: arduino-cli compile --fqbn esp8266:esp8266:generic /home/runner/work/arduino-project/arduino-project/src/src.ino --output-dir ./build
+        run: arduino-cli compile --fqbn esp8266:esp8266:generic /home/runner/work/FingerBot/FingerBot/src/src.ino --output-dir ./build
 
       - name: Upload Firmware
         run: |
