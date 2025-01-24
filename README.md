@@ -185,3 +185,5 @@ Wrote 474528 bytes (342649 compressed) at 0x00000000 in 32.4 seconds (effective 
 Hash of data verified.
 Leaving...
 Hard resetting via RTS pin...`
+
+![IMG_20250124_215536](https://github.com/user-attachments/assets/ea8548ea-be96-4dd1-a7a1-065d708ca331)
