@@ -167,7 +167,7 @@ Hard resetting via RTS pin...`
 
 python -m esptool --port COM10 write_flash 0x00000 "C:\user\Downloads\src.ino.bin"
 
-`esptool.py v4.8.1
+``esptool.py v4.8.1
 Serial port COM10
 Connecting...
 Detecting chip type... Unsupported detection protocol, switching and trying again...
@@ -185,4 +185,4 @@ Wrote 474528 bytes (342649 compressed) at 0x00000000 in 32.4 seconds (effective 
 Hash of data verified.
 
 Leaving...
-Hard resetting via RTS pin...`
+Hard resetting via RTS pin...``
