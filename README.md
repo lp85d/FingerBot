@@ -143,7 +143,7 @@ Esp-01s
 The device found is a 3rd party device but we are not sure it's a NodeMCU-32S.   
 ESP32 контроллер ESP32-WROOM-32 NodeMCU c WI-FI и Bluetooth для Arduino   
 
-## Форматировать чип
+## Форматировать чип:
 
 python -m esptool --port COM10 erase_flash   
 `esptool.py v4.8.1
@@ -161,4 +161,28 @@ Running stub...
 Stub running...
 Erasing flash (this may take a while)...
 Chip erase completed successfully in 4.1s
+Hard resetting via RTS pin...`
+
+## Прошить чип:
+
+python -m esptool --port COM10 write_flash 0x00000 "C:\user\Downloads\src.ino.bin"
+
+`esptool.py v4.8.1
+Serial port COM10
+Connecting...
+Detecting chip type... Unsupported detection protocol, switching and trying again...
+Connecting...
+Detecting chip type... ESP8266
+Chip is ESP8266EX
+Features: WiFi
+Crystal is 26MHz
+MAC: 60:01:94:28:64:f4
+Stub is already running. No upload is necessary.
+Configuring flash size...
+Flash will be erased from 0x00000000 to 0x00073fff...
+Compressed 474528 bytes to 342649...
+Wrote 474528 bytes (342649 compressed) at 0x00000000 in 32.4 seconds (effective 117.1 kbit/s)...
+Hash of data verified.
+
+Leaving...
 Hard resetting via RTS pin...`
