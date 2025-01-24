@@ -132,6 +132,14 @@ E:\OSPanel\home\lp85d.ru>osp log . 2 | findstr "fingerbot.ru"
 
 Если вы хотите внести свой вклад в проект, пожалуйста, создайте форк и отправьте пулл-реквест.
 
-## Лицензия
+## Популярые модули:   
 
-Укажите лицензию, под которой распространяется проект (например, MIT, GNU и т.д.).
+## Generic ESP8266 Module   
+The device found is a 3rd party device but we are not sure it's a Generic ESP8266 Module.   
+Беспроводной модуль ESP8266 ESP-12F ESP-12E ESP-07 ESP-01S   
+Esp-01s   
+
+## NodeMCU-32S   
+The device found is a 3rd party device but we are not sure it's a NodeMCU-32S.   
+ESP32 контроллер ESP32-WROOM-32 NodeMCU c WI-FI и Bluetooth для Arduino   
+
