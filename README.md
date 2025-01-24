@@ -143,7 +143,7 @@ Esp-01s
 The device found is a 3rd party device but we are not sure it's a NodeMCU-32S.   
 ESP32 контроллер ESP32-WROOM-32 NodeMCU c WI-FI и Bluetooth для Arduino   
 
-№№ Форматировать чип
+## Форматировать чип
 
 python -m esptool --port COM10 erase_flash   
 `esptool.py v4.8.1
